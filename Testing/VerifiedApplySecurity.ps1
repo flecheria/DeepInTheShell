@@ -1,8 +1,16 @@
-# Verify applied security settings
+# get complete computer status
+Get-MpComputerStatus
+
+# Security status
 Get-MpComputerStatus | Select-Object RealTimeProtectionEnabled, AntivirusEnabled, AntispywareEnabled
 
-# Check firewall status
+# Firewall
 Get-NetFirewallProfile | Select-Object Name, Enabled
 
-# List all running services
-Get-Service | Where-Object {$_.Status -eq "Running"} | Select-Object DisplayName, Status
+# Running services - use WMI for enumeration
+Get-WmiObject -Class Win32_Service -Filter "State='Running'" | 
+    Select-Object DisplayName, State
+
+# Specific services - Get-Service works fine here
+Get-Service -Name "DiagTrack", "dmwappushservice", "lfsvc" -ErrorAction SilentlyContinue |
+    Select-Object Name, Status, StartType, DisplayName
