@@ -4,6 +4,14 @@
 
 Powershell commands toolkit to hardening and managing different aspects of a Windows OS machine.
 
+```shell
+Import-Module .\HardeningKitty.psm1
+
+Invoke-HardeningKitty -Mode Audit -Report
+
+Invoke-HardeningKitty -Mode Audit -Filter { $_.ID -in @(1768,1769,1772) }
+```
+
 ## Running Scripts
 
 Most of this script need to be run using terminal in Admin mode.
