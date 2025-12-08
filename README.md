@@ -4,6 +4,21 @@
 
 Powershell commands toolkit to hardening and managing different aspects of a Windows OS machine.
 
+Fully non-interactive script: make sure to review everything before running it.
+Designed for Windows 11 (most tweaks/settings also work on Windows 10).
+Works on both Administrator and Standard account.
+
+🖥️ Windows settings
+📁 File Explorer
+⌛ System Properties
+⚡ Power options
+🌐 Network
+📊 Telemetry
+🛠️ Tweaks
+💿 Applications
+💾 RamDisk
+⚙️ Services & Scheduled Tasks
+
 ```shell
 Import-Module .\HardeningKitty.psm1
 
@@ -62,6 +77,27 @@ Get-Service | Where-Object {$_.Name -like "*bdredline*" -or $_.Name -like "*vsse
 Get-NetTCPConnection -LocalPort 3389 -State Listen -ErrorAction SilentlyContinue
 ```
 
+## Sysmon
+
+Sysmon events are saved [here](C:\ProgramData\Microsoft\Event Viewer).
+
+```shell
+# get event via powershell
+Get-WinEvent -LogName "Microsoft-Windows-Sysmon/Operational" -MaxEvents 10 | ForEach-Object { $_.ToXml() }
+
+# Export to EVTX (native format, contains XML)
+wevtutil epl Microsoft-Windows-Sysmon/Operational C:\output.evtx
+
+# Or export as XML directly
+wevtutil qe Microsoft-Windows-Sysmon/Operational /f:xml > C:\output.xml
+
+Get-WinEvent -LogName "Microsoft-Windows-Sysmon/Operational" |
+    Select-Object -Property TimeCreated,
+                           Id,
+                           @{Name='EventDataXml'; Expression={$_.ToXml()}} |
+    Export-Csv sysmon_events_with_xml.csv -NoTypeInformation
+```
+
 ## TODO
 
 Need to be fully tested:
@@ -77,3 +113,6 @@ Need to be fully tested:
 [](https://github.com/shanerwilson/Windows-Hardening-Scripts-Collection)
 [Windows Policy Analyzer](https://learn.microsoft.com/en-us/archive/blogs/secguide/new-tool-policy-analyzer)
 [Microsoft Security Compliance Toolkit 1.0](https://www.microsoft.com/en-us/download/details.aspx?id=55319)
+[](https://github.com/agadiffe/WindowsMize)  
+[SysInternals Lab](https://github.com/kinnaridobariya/Sysinternals-Labs)  
+[Red Canary Atomic Red Team](https://www.atomicredteam.io/)
